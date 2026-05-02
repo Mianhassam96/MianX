@@ -154,17 +154,27 @@ export default function InteractiveDemo() {
   const [streak, setStreak] = useState(0);
   const [selectedReply, setSelectedReply] = useState<number | null>(null);
   const [todayCount, setTodayCount] = useState(0);
+  const [bestScore, setBestScore] = useState(0);
+  const [currentScore, setCurrentScore] = useState<number | null>(null);
+  const [copied, setCopied] = useState<number | null>(null);
+  const [shared, setShared] = useState(false);
 
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) setHistory(JSON.parse(stored));
+      if (stored) {
+        const h = JSON.parse(stored);
+        setHistory(h);
+        const best = Math.max(...h.map((x: AnalysisResult) => x.score), 0);
+        setBestScore(best);
+      }
       const s = localStorage.getItem(STREAK_KEY);
       if (s) {
-        const { count, date, today } = JSON.parse(s);
+        const { count, date, today, best } = JSON.parse(s);
         const isToday = date === new Date().toDateString();
         setStreak(isToday ? count : 0);
         setTodayCount(isToday ? (today || 0) : 0);
+        if (best) setBestScore(best);
       }
     } catch {}
   }, []);
@@ -180,6 +190,7 @@ export default function InteractiveDemo() {
       setAnalysis(result);
       setIsLoading(false);
       setShowResult(true);
+      setCurrentScore(result.inputScore);
 
       const newEntry: AnalysisResult = {
         message: message.slice(0, 60) + (message.length > 60 ? "…" : ""),
@@ -212,6 +223,27 @@ export default function InteractiveDemo() {
       e.preventDefault();
       handleAnalyze();
     }
+  };
+
+  const copyReply = (text: string, index: number) => {
+    try { navigator.clipboard.writeText(text); } catch {
+      const el = document.createElement("textarea");
+      el.value = text; document.body.appendChild(el); el.select();
+      document.execCommand("copy"); document.body.removeChild(el);
+    }
+    setCopied(index);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const shareScore = () => {
+    const score = currentScore || 0;
+    const text = `My message scored ${score}/100 on MianX 🔥\nMost people stay below 60.\nhttps://mianhassam96.github.io/MianX/`;
+    try {
+      if (navigator.share) { navigator.share({ title: "MianX Score", text }); }
+      else { navigator.clipboard.writeText(text); }
+    } catch {}
+    setShared(true);
+    setTimeout(() => setShared(false), 3000);
   };
 
   const avgScore = history.length > 0
@@ -286,6 +318,43 @@ export default function InteractiveDemo() {
                 </span>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Daily progress dashboard */}
+        {(streak > 0 || bestScore > 0) && (
+          <div className="mb-8 p-5 rounded-2xl border border-white/8 bg-[#111111]">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs text-[#a1a1aa] font-mono uppercase tracking-widest">Your Progress</span>
+              {streak >= 3 && <span className="text-xs text-[#FBBF24] font-semibold">🔥 On a roll</span>}
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-black mb-1" style={{ color: avgScore && avgScore < 40 ? "#F87171" : avgScore && avgScore < 65 ? "#FBBF24" : "#22C55E" }}>
+                  {avgScore ?? "—"}
+                  {avgScore && <span className="text-sm font-normal text-white/30">/100</span>}
+                </div>
+                <div className="text-xs text-[#a1a1aa]">Your average</div>
+              </div>
+              <div className="text-center border-x border-white/5">
+                <div className="text-2xl font-black text-white mb-1">{todayCount}</div>
+                <div className="text-xs text-[#a1a1aa]">Today</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-black mb-1 text-gradient">{bestScore > 0 ? bestScore : "—"}</div>
+                <div className="text-xs text-[#a1a1aa]">Best score 🔥</div>
+              </div>
+            </div>
+            {avgScore !== null && avgScore < 60 && (
+              <p className="text-xs text-white/30 text-center mt-3 border-t border-white/5 pt-3">
+                You&apos;re improving. <span className="text-white/50">Most people stay below 60.</span>
+              </p>
+            )}
+            {avgScore !== null && avgScore >= 60 && (
+              <p className="text-xs text-[#22C55E]/60 text-center mt-3 border-t border-white/5 pt-3">
+                Above average. <span className="text-[#22C55E]/80">Top 20% of users.</span>
+              </p>
+            )}
           </div>
         )}
 
@@ -386,19 +455,29 @@ export default function InteractiveDemo() {
                         boxShadow: selectedReply === i ? `0 0 16px ${reply.labelBg}` : "none",
                       }}
                     >
-                      <div className="flex items-center justify-between px-4 py-3">
-                        <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-between px-4 py-3 gap-2">
+                        <div className="flex items-center gap-3 flex-1 min-w-0" onClick={() => setSelectedReply(selectedReply === i ? null : i)}>
                           <span
-                            className="text-xs font-bold px-2 py-0.5 rounded-full"
+                            className="text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0"
                             style={{ background: reply.labelBg, color: reply.labelColor }}
                           >
                             {reply.label}
                           </span>
-                          <span className="text-white font-mono text-sm">&ldquo;{reply.text}&rdquo;</span>
+                          <span className="text-white font-mono text-sm truncate">&ldquo;{reply.text}&rdquo;</span>
                         </div>
-                        <span className="text-xs font-bold flex-shrink-0 ml-2" style={{ color: reply.labelColor }}>
-                          {reply.score}/100
-                        </span>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className="text-xs font-bold" style={{ color: reply.labelColor }}>{reply.score}/100</span>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); copyReply(reply.text, i); }}
+                            className="text-xs px-2.5 py-1 rounded-lg border transition-all duration-200 font-semibold"
+                            style={copied === i
+                              ? { background: "rgba(34,197,94,0.15)", borderColor: "rgba(34,197,94,0.4)", color: "#22C55E" }
+                              : { background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.1)", color: "#a1a1aa" }
+                            }
+                          >
+                            {copied === i ? "✓ Copied!" : "Copy"}
+                          </button>
+                        </div>
                       </div>
                       {selectedReply === i && (
                         <div className="px-4 pb-4">
@@ -415,12 +494,28 @@ export default function InteractiveDemo() {
               </div>
 
               {/* MianX Insight */}
-              <div className="p-4 rounded-xl border border-[#8B5CF6]/20 bg-[#8B5CF6]/5">
+              <div className="p-4 rounded-xl border border-[#8B5CF6]/20 bg-[#8B5CF6]/5 mb-4">
                 <p className="text-sm text-[#a1a1aa] leading-relaxed">
                   <span className="text-[#8B5CF6] font-semibold">MianX Insight: </span>
                   {analysis.insight}
                 </p>
               </div>
+
+              {/* Share score */}
+              <button
+                onClick={shareScore}
+                className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border transition-all duration-300 font-semibold text-sm"
+                style={shared
+                  ? { background: "rgba(34,197,94,0.1)", borderColor: "rgba(34,197,94,0.3)", color: "#22C55E" }
+                  : { background: "rgba(139,92,246,0.06)", borderColor: "rgba(139,92,246,0.2)", color: "#8B5CF6" }
+                }
+              >
+                {shared ? (
+                  <>✓ Copied to clipboard — send it!</>
+                ) : (
+                  <>🔥 This message scored {currentScore}/100 — Share your score</>
+                )}
+              </button>
             </div>
           )}
 

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#F472B6"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#8B5CF6" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="32" height="32" rx="8" fill="url(#bg)"/>
+
+  <!-- Inner dark surface -->
+  <rect x="2" y="2" width="28" height="28" rx="6" fill="#0a0a0a" opacity="0.85"/>
+
+  <!-- M letterform — sharp, geometric, premium -->
+  <path
+    d="M7 22V10L12.5 18L16 12L19.5 18L25 10V22"
+    stroke="url(#glow)"
+    stroke-width="2.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+    filter="url(#shadow)"
+  />
+
+  <!-- X accent dot — bottom right -->
+  <circle cx="25" cy="23" r="2" fill="url(#bg)" opacity="0.9"/>
+  <circle cx="25" cy="23" r="1.2" fill="#EC4899"/>
+</svg>

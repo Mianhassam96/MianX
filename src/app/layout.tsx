@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MianX — Know What They Mean. Before You Reply.",
+  title: "MianX — Before you reply… know exactly what it will cost you.",
   description:
     "MianX analyzes hidden intent, predicts outcomes, and shows you the smartest move—before you hit send.",
   keywords: [
@@ -11,12 +11,20 @@ export const metadata: Metadata = {
     "hidden intent",
     "reply strategy",
     "communication tool",
+    "text message analyzer",
   ],
   openGraph: {
-    title: "MianX — Know What They Mean. Before You Reply.",
+    title: "MianX — Before you reply… know exactly what it will cost you.",
     description:
       "MianX analyzes hidden intent, predicts outcomes, and shows you the smartest move—before you hit send.",
     type: "website",
+  },
+  icons: {
+    icon: [
+      { url: "/MianX/favicon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/MianX/favicon.svg",
+    apple: "/MianX/favicon.svg",
   },
 };
 
@@ -28,6 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
+        <link rel="icon" type="image/svg+xml" href="/MianX/favicon.svg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
