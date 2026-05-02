@@ -285,6 +285,15 @@ export default function InteractiveDemo() {
           <span className="text-gradient">See the truth.</span>
         </h2>
 
+        {/* Use before sending — lock-in */}
+        <div className="flex items-center gap-3 mb-4 px-4 py-2.5 rounded-xl bg-white/3 border border-white/5">
+          <span className="text-white/40 text-sm">💬</span>
+          <p className="text-xs text-white/50">
+            People who check messages here get{" "}
+            <span className="text-white/80 font-semibold">3x more replies.</span>
+          </p>
+        </div>
+
         {/* Urgency anchor */}
         <div className="flex items-center gap-3 mb-8 px-4 py-3 rounded-xl border border-[#EC4899]/20 bg-[#EC4899]/5">
           <span className="text-[#EC4899] text-lg">⚡</span>
@@ -399,6 +408,40 @@ export default function InteractiveDemo() {
           {/* Output */}
           {showResult && analysis && (
             <div className="border-t border-white/5 p-6">
+
+              {/* BEFORE vs AFTER score cards — visual impact */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/5 text-center">
+                  <p className="text-xs text-[#a1a1aa] mb-2 uppercase tracking-widest font-mono">Your message</p>
+                  <div className="text-3xl font-black text-[#F87171] mb-1">{currentScore}<span className="text-base font-normal text-white/30">/100</span></div>
+                  <div className="h-1.5 bg-white/5 rounded-full overflow-hidden mt-2">
+                    <div className="h-full rounded-full bg-[#F87171] transition-all duration-1000" style={{ width: `${currentScore}%`, boxShadow: "0 0 8px #F87171" }} />
+                  </div>
+                  <p className="text-xs text-[#F87171] mt-2 font-semibold">❌ As written</p>
+                </div>
+                <div className="p-4 rounded-xl border border-[#FBBF24]/20 bg-[#FBBF24]/5 text-center">
+                  <p className="text-xs text-[#a1a1aa] mb-2 uppercase tracking-widest font-mono">High-Status reply</p>
+                  <div className="text-3xl font-black text-[#FBBF24] mb-1">94<span className="text-base font-normal text-white/30">/100</span></div>
+                  <div className="h-1.5 bg-white/5 rounded-full overflow-hidden mt-2">
+                    <div className="h-full rounded-full bg-[#FBBF24] transition-all duration-1000 delay-300" style={{ width: "94%", boxShadow: "0 0 8px #FBBF24" }} />
+                  </div>
+                  <p className="text-xs text-[#FBBF24] mt-2 font-semibold">🔥 With MianX</p>
+                </div>
+              </div>
+
+              {/* Emotional outcome line */}
+              <div className="mb-5 px-4 py-3 rounded-xl border border-[#EC4899]/20 bg-[#EC4899]/5 flex items-center gap-3">
+                <span className="text-lg flex-shrink-0">🛡️</span>
+                <p className="text-sm font-semibold text-white/80">
+                  {(currentScore ?? 0) < 40
+                    ? "You just avoided being ignored."
+                    : (currentScore ?? 0) < 60
+                    ? "This message would have lowered your value."
+                    : "Solid message — MianX made it sharper."}
+                  {" "}<span className="text-[#EC4899]">MianX caught it.</span>
+                </p>
+              </div>
+
               {/* Analysis rows */}
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-2 h-2 rounded-full bg-[#8B5CF6] animate-pulse" />
@@ -440,29 +483,34 @@ export default function InteractiveDemo() {
                 ))}
               </div>
 
-              {/* 3 Reply variants */}
+              {/* 3 Reply variants — High-Status highlighted by default */}
               <div className="mb-5">
                 <p className="text-xs text-[#a1a1aa] font-mono uppercase tracking-widest mb-3">✅ Reply Strategies</p>
                 <div className="space-y-3">
-                  {analysis.replies.map((reply, i) => (
+                  {analysis.replies.map((reply, i) => {
+                    const isHighStatus = i === 2;
+                    const isSelected = selectedReply === i || (selectedReply === null && isHighStatus);
+                    return (
                     <div
                       key={i}
-                      onClick={() => setSelectedReply(selectedReply === i ? null : i)}
+                      onClick={() => setSelectedReply(i)}
                       className="rounded-xl border cursor-pointer transition-all duration-300"
                       style={{
-                        background: selectedReply === i ? reply.labelBg : "rgba(0,0,0,0.2)",
-                        borderColor: selectedReply === i ? reply.labelColor : "rgba(255,255,255,0.06)",
-                        boxShadow: selectedReply === i ? `0 0 16px ${reply.labelBg}` : "none",
+                        background: isSelected ? reply.labelBg : "rgba(0,0,0,0.2)",
+                        borderColor: isSelected ? reply.labelColor : "rgba(255,255,255,0.06)",
+                        boxShadow: isHighStatus ? `0 0 24px ${reply.labelBg}, 0 0 1px ${reply.labelColor}` : isSelected ? `0 0 16px ${reply.labelBg}` : "none",
+                        transform: isHighStatus ? "scale(1.01)" : "none",
                       }}
                     >
                       <div className="flex items-center justify-between px-4 py-3 gap-2">
-                        <div className="flex items-center gap-3 flex-1 min-w-0" onClick={() => setSelectedReply(selectedReply === i ? null : i)}>
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
                           <span
                             className="text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0"
                             style={{ background: reply.labelBg, color: reply.labelColor }}
                           >
                             {reply.label}
                           </span>
+                          {isHighStatus && <span className="text-xs text-[#FBBF24]/70 font-semibold flex-shrink-0">★ Best</span>}
                           <span className="text-white font-mono text-sm truncate">&ldquo;{reply.text}&rdquo;</span>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
@@ -472,14 +520,16 @@ export default function InteractiveDemo() {
                             className="text-xs px-2.5 py-1 rounded-lg border transition-all duration-200 font-semibold"
                             style={copied === i
                               ? { background: "rgba(34,197,94,0.15)", borderColor: "rgba(34,197,94,0.4)", color: "#22C55E" }
+                              : isHighStatus
+                              ? { background: reply.labelBg, borderColor: reply.labelColor, color: reply.labelColor }
                               : { background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.1)", color: "#a1a1aa" }
                             }
                           >
-                            {copied === i ? "✓ Copied!" : "Copy"}
+                            {copied === i ? "✓ Sent!" : isHighStatus ? "Copy & Send →" : "Copy"}
                           </button>
                         </div>
                       </div>
-                      {selectedReply === i && (
+                      {isSelected && (
                         <div className="px-4 pb-4">
                           <p className="text-xs text-[#a1a1aa] leading-relaxed border-t border-white/5 pt-3">
                             <span className="font-semibold" style={{ color: reply.labelColor }}>Why this works: </span>
@@ -488,9 +538,10 @@ export default function InteractiveDemo() {
                         </div>
                       )}
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
-                <p className="text-xs text-white/25 mt-2 text-center">Tap any reply to see why it works</p>
+                <p className="text-xs text-white/25 mt-2 text-center">Tap any reply to expand · Copy to use instantly</p>
               </div>
 
               {/* MianX Insight */}
@@ -501,21 +552,41 @@ export default function InteractiveDemo() {
                 </p>
               </div>
 
-              {/* Share score */}
-              <button
-                onClick={shareScore}
-                className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border transition-all duration-300 font-semibold text-sm"
-                style={shared
-                  ? { background: "rgba(34,197,94,0.1)", borderColor: "rgba(34,197,94,0.3)", color: "#22C55E" }
-                  : { background: "rgba(139,92,246,0.06)", borderColor: "rgba(139,92,246,0.2)", color: "#8B5CF6" }
-                }
-              >
-                {shared ? (
-                  <>✓ Copied to clipboard — send it!</>
-                ) : (
-                  <>🔥 This message scored {currentScore}/100 — Share your score</>
+              {/* Share score + micro addiction feedback */}
+              <div className="space-y-3">
+                {/* Micro addiction line */}
+                <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/3 border border-white/5">
+                  <span className="text-xs text-[#a1a1aa]">
+                    {todayCount === 1 && "First message analyzed today 🎯"}
+                    {todayCount === 2 && "+1 improved message today 📈"}
+                    {todayCount === 3 && "🔥 You've improved 3 messages today"}
+                    {todayCount > 3 && `🔥 ${todayCount} messages improved today — you're in the top 20%`}
+                  </span>
+                  {bestScore > 0 && (
+                    <span className="text-xs text-[#FBBF24] font-semibold flex-shrink-0 ml-2">Best: {bestScore}/100</span>
+                  )}
+                </div>
+
+                {/* After copy CTA */}
+                {copied !== null && (
+                  <div className="px-4 py-3 rounded-xl border border-[#22C55E]/20 bg-[#22C55E]/5 text-center">
+                    <p className="text-sm font-semibold text-[#22C55E]">Now send it.</p>
+                    <p className="text-xs text-white/40 mt-0.5">Come back when they reply. MianX will decode their response too.</p>
+                  </div>
                 )}
-              </button>
+
+                {/* Share button */}
+                <button
+                  onClick={shareScore}
+                  className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border transition-all duration-300 font-semibold text-sm"
+                  style={shared
+                    ? { background: "rgba(34,197,94,0.1)", borderColor: "rgba(34,197,94,0.3)", color: "#22C55E" }
+                    : { background: "rgba(139,92,246,0.06)", borderColor: "rgba(139,92,246,0.2)", color: "#8B5CF6" }
+                  }
+                >
+                  {shared ? "✓ Copied — share it and watch them ask what tool you use" : `🔥 This message scored ${currentScore}/100 — Share your score`}
+                </button>
+              </div>
             </div>
           )}
 
@@ -583,6 +654,11 @@ export default function InteractiveDemo() {
                 {streak >= 2 && (
                   <p className="text-xs text-[#FBBF24]/60 pt-1">
                     🔥 You&apos;ve improved <span className="text-[#FBBF24] font-semibold">{streak} messages</span> today
+                  </p>
+                )}
+                {avgScore !== null && avgScore < 60 && (
+                  <p className="text-xs text-white/30 pt-1">
+                    <span className="text-white/50">{Math.max(0, 3 - history.length)} more analyses</span> to reach top 20%
                   </p>
                 )}
               </div>
