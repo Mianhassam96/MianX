@@ -5,17 +5,21 @@ import { useState } from "react";
 const modes = [
   {
     icon: "🧊",
-    label: "Stay Mysterious",
-    description: "Keep them guessing. Less is more.",
+    label: "Cold Control",
+    tagline: "They chase. You decide.",
+    description: "Minimal. Measured. Magnetic. Every word is deliberate—nothing is given away for free.",
+    example: "They said: 'Are you mad at me?' → You reply: 'No.' (full stop)",
     color: "#60A5FA",
     bg: "rgba(96, 165, 250, 0.1)",
     border: "rgba(96, 165, 250, 0.3)",
     glow: "rgba(96, 165, 250, 0.4)",
   },
   {
-    icon: "❤️",
-    label: "Build Attraction",
-    description: "Deepen the connection intentionally.",
+    icon: "🔥",
+    label: "High Attraction",
+    tagline: "Pull them in. Keep them there.",
+    description: "Emotionally intelligent replies that build tension, deepen connection, and make them think about you after.",
+    example: "They said: 'I miss you' → You reply: 'Tell me more about that.'",
     color: "#F87171",
     bg: "rgba(248, 113, 113, 0.1)",
     border: "rgba(248, 113, 113, 0.3)",
@@ -23,66 +27,69 @@ const modes = [
   },
   {
     icon: "🧠",
-    label: "Stay Smart",
-    description: "Respond with clarity and confidence.",
+    label: "Strategic Dominance",
+    tagline: "Always three moves ahead.",
+    description: "Analytical, precise, and always in control. You see the subtext. You respond to the real message.",
+    example: "They said: 'Whatever you think is fine' → You reply: 'What do you actually want?'",
     color: "#8B5CF6",
     bg: "rgba(139, 92, 246, 0.1)",
     border: "rgba(139, 92, 246, 0.3)",
     glow: "rgba(139, 92, 246, 0.4)",
   },
   {
-    icon: "🔥",
-    label: "Win the Moment",
-    description: "Take control of the conversation.",
-    color: "#FB923C",
-    bg: "rgba(251, 146, 60, 0.1)",
-    border: "rgba(251, 146, 60, 0.3)",
-    glow: "rgba(251, 146, 60, 0.4)",
-  },
-  {
     icon: "😌",
-    label: "Keep It Casual",
-    description: "Relaxed, natural, no pressure.",
+    label: "Effortless Presence",
+    tagline: "Calm. Grounded. Unshakeable.",
+    description: "You don't react—you respond. Relaxed confidence that signals you have options and aren't desperate for any outcome.",
+    example: "They said: 'I've been busy' → You reply: 'No worries, same here.'",
     color: "#34D399",
     bg: "rgba(52, 211, 153, 0.1)",
     border: "rgba(52, 211, 153, 0.3)",
     glow: "rgba(52, 211, 153, 0.4)",
   },
+  {
+    icon: "⚡",
+    label: "Instant Impact",
+    tagline: "One reply. Maximum effect.",
+    description: "When you need to flip the dynamic fast. Sharp, unexpected, and impossible to ignore.",
+    example: "They said: 'I don't know what I want' → You reply: 'Let me know when you do.'",
+    color: "#FBBF24",
+    bg: "rgba(251, 191, 36, 0.1)",
+    border: "rgba(251, 191, 36, 0.3)",
+    glow: "rgba(251, 191, 36, 0.4)",
+  },
 ];
 
 export default function ModeSystem() {
-  const [selected, setSelected] = useState(2); // Default: Stay Smart
+  const [selected, setSelected] = useState(2);
 
   return (
     <section className="py-24 md:py-32 px-6 relative overflow-hidden">
-      {/* Background */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background:
-            "radial-gradient(ellipse 60% 40% at 50% 50%, rgba(139, 92, 246, 0.04) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse 60% 40% at 50% 50%, rgba(139, 92, 246, 0.04) 0%, transparent 70%)",
         }}
       />
 
       <div className="max-w-5xl mx-auto relative z-10">
-        {/* Section label */}
         <div className="flex items-center gap-3 mb-8">
           <div className="w-8 h-px bg-[#EC4899]" />
-          <span className="text-[#EC4899] text-sm font-medium tracking-widest uppercase">
-            Mode System
-          </span>
+          <span className="text-[#EC4899] text-sm font-medium tracking-widest uppercase">Mode System</span>
         </div>
 
-        {/* Title */}
         <div className="max-w-2xl mb-4">
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-black leading-tight text-white">
             Choose how you want to{" "}
             <span className="text-gradient">play it.</span>
           </h2>
         </div>
+        <p className="text-[#a1a1aa] text-lg mb-10 max-w-xl">
+          Same message. Five completely different outcomes. Pick your mode before you reply.
+        </p>
 
         {/* Mode pills */}
-        <div className="flex flex-wrap gap-3 mb-12">
+        <div className="flex flex-wrap gap-3 mb-8">
           {modes.map((mode, index) => (
             <button
               key={index}
@@ -110,7 +117,7 @@ export default function ModeSystem() {
           ))}
         </div>
 
-        {/* Selected mode detail card */}
+        {/* Selected mode detail */}
         <div
           className="p-8 rounded-2xl border transition-all duration-500"
           style={{
@@ -126,26 +133,28 @@ export default function ModeSystem() {
             >
               {modes[selected].icon}
             </div>
-            <div>
-              <h3
-                className="text-2xl font-bold mb-2"
-                style={{ color: modes[selected].color }}
-              >
-                {modes[selected].label}
-              </h3>
-              <p className="text-[#a1a1aa] text-base leading-relaxed mb-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-1">
+                <h3 className="text-2xl font-bold" style={{ color: modes[selected].color }}>
+                  {modes[selected].label}
+                </h3>
+              </div>
+              <p className="text-white/50 text-sm italic mb-3">{modes[selected].tagline}</p>
+              <p className="text-[#a1a1aa] text-base leading-relaxed mb-5">
                 {modes[selected].description}
               </p>
-              <p className="text-white/60 text-sm">
-                MianX will tailor every analysis and reply suggestion to match
-                this mode—giving you responses that align with your exact
-                intention.
-              </p>
+              {/* Example */}
+              <div
+                className="p-4 rounded-xl border"
+                style={{ background: "rgba(0,0,0,0.3)", borderColor: "rgba(255,255,255,0.06)" }}
+              >
+                <p className="text-xs text-white/30 font-mono uppercase tracking-widest mb-2">Example</p>
+                <p className="text-sm text-white/70 font-mono leading-relaxed">{modes[selected].example}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Tagline */}
         <div className="mt-10 text-center">
           <p className="text-2xl font-bold text-white/80">
             Same message.{" "}
